@@ -79,6 +79,7 @@ WHERE
 --3 without having
 WITH BALANCE_FROM_1001 AS(
     SELECT
+        BRANCH_NAME,
         BRANCH_CITY,
         SUM(BALANCE) AS SUM_BALANCE,
         AVG(BALANCE) AS AVG_BALANCE
@@ -86,6 +87,7 @@ WITH BALANCE_FROM_1001 AS(
         BRANCH
         NATURAL JOIN ACCOUNT
     GROUP BY
+        BRANCH_NAME,
         BRANCH_CITY
 )
 SELECT
@@ -99,11 +101,62 @@ WHERE
 --3 with having
 SELECT
     BRANCH_CITY,
-    AVG(BALANCE)
+    AVG(TEMP.AVG_B)
 FROM
-    BRANCH
-    NATURAL JOIN ACCOUNT
+    (
+        SELECT
+            BRANCH_NAME,
+            AVG(BALANCE) AS AVG_B,
+            SUM(BALANCE) AS SUM_B
+        FROM
+            BRANCH
+            NATURAL JOIN ACCOUNT
+        GROUP BY
+            BRANCH_NAME
+        HAVING
+            SUM(BALANCE) >=1000
+    )      TEMP,
+    BRANCH B
+WHERE
+    B.BRANCH_NAME = TEMP.BRANCH_NAME
 GROUP BY
-    BRANCH_CITY
-HAVING
-    SUM(BALANCE) >=1000;
+    BRANCH_CITY;
+
+--4 without having
+WITH TEMP AS(
+    SELECT
+        BRANCH_CITY,
+        BRANCH_NAME,
+        AVG(AMOUNT) AS AVG_AM
+    FROM
+        LOAN
+        NATURAL JOIN BRANCH
+    GROUP BY
+        BRANCH_CITY,
+        BRANCH_NAME
+)
+SELECT
+    TEMP2.BRANCH_CITY,
+    AVG(AVG_AM)
+FROM
+    (
+        SELECT
+            BRANCH_CITY,
+            BRANCH_NAME,
+            AVG_AM
+        FROM
+            TEMP
+        WHERE
+            1500 < ALL(
+                SELECT
+                    AMOUNT
+                FROM
+                    LOAN
+                WHERE
+                    BRANCH_NAME = TEMP.BRANCH_NAME
+            )
+    )TEMP2,      BRANCH B
+WHERE
+    B.BRANCH_NAME = TEMP2.BRANCH_NAME
+GROUP BY
+    TEMP2.BRANCH_CITY
