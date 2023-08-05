@@ -245,3 +245,45 @@ WHERE
         FROM
             LOAN
     );
+
+-- 7 using in
+SELECT
+DISTINCT
+    BRANCH_NAME,
+    BRANCH_CITY
+FROM
+    ACCOUNT
+    NATURAL JOIN DEPOSITOR
+    NATURAL JOIN BRANCH
+WHERE
+    BRANCH_NAME IN (
+        SELECT
+            BRANCH_NAME
+        FROM
+            LOAN
+            NATURAL JOIN BORROWER
+            NATURAL JOIN BRANCH
+    );
+
+--7 using exists
+SELECT
+DISTINCT
+    B.BRANCH_NAME,
+    BRANCH_CITY
+FROM
+    ACCOUNT   A,
+    DEPOSITOR D,
+    BRANCH    B
+WHERE
+    A.ACCOUNT_NUMBER = D.ACCOUNT_NUMBER
+    AND B.BRANCH_NAME = A.BRANCH_NAME
+    AND EXISTS(
+        SELECT
+            *
+        FROM
+            LOAN      L,
+            BORROWER  BO,
+            BRANCH    BR
+        WHERE L.LOAN_NUMBER = BO.LOAN_NUMBER
+        AND L.BRANCH_NAME = BR.BRANCH_NAME AND B.BRANCH_NAME = BR.BRANCH_NAME
+    );
