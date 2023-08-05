@@ -322,5 +322,66 @@ WHERE
         FROM
             CUSTOMER
             NATURAL JOIN BORROWER
-    ); 
+    );
 
+--9 with 'with'
+WITH TOTAL_BALANCE AS(
+    SELECT
+        BRANCH_NAME,
+        SUM(BALANCE) AS SUM_BALANCE
+    FROM
+        DEPOSITOR
+        NATURAL JOIN ACCOUNT
+    GROUP BY
+        BRANCH_NAME
+), AVG_TOTAL_BALANCE AS(
+    SELECT
+        AVG(SUM_BALANCE) AS AVG_TOTAL_BALANCE
+    FROM
+        TOTAL_BALANCE
+)
+SELECT
+    BRANCH.BRANCH_NAME,
+    BRANCH_CITY
+FROM
+    BRANCH,
+    TOTAL_BALANCE,
+    AVG_TOTAL_BALANCE
+WHERE
+    TOTAL_BALANCE.BRANCH_NAME = BRANCH.BRANCH_NAME
+    AND TOTAL_BALANCE.SUM_BALANCE> AVG_TOTAL_BALANCE.AVG_TOTAL_BALANCE;
+
+--9 without 'with'
+SELECT
+    BRANCH.BRANCH_NAME,
+    BRANCH_CITY
+FROM
+    BRANCH,
+    (
+        SELECT
+            BRANCH_NAME,
+            SUM(BALANCE) AS SUM_BALANCE
+        FROM
+            DEPOSITOR
+            NATURAL JOIN ACCOUNT
+        GROUP BY
+            BRANCH_NAME
+    )      TOTAL_BALANCE,
+    (
+        SELECT
+            AVG(SUM_BALANCE) AS AVG_TOTAL_BALANCE
+        FROM
+            (
+                SELECT
+                    BRANCH_NAME,
+                    SUM(BALANCE) AS SUM_BALANCE
+                FROM
+                    DEPOSITOR
+                    NATURAL JOIN ACCOUNT
+                GROUP BY
+                    BRANCH_NAME
+            ) TOTAL_BALANCE
+    )      AVG_TOTAL_BALANCE
+WHERE
+    TOTAL_BALANCE.BRANCH_NAME = BRANCH.BRANCH_NAME
+    AND TOTAL_BALANCE.SUM_BALANCE> AVG_TOTAL_BALANCE.AVG_TOTAL_BALANCE;
