@@ -78,13 +78,25 @@ FROM
 --3 without having
 WITH BALANCE_FROM_1001 AS(
     SELECT
+        BRANCH_NAME,
         BRANCH_CITY,
-        ASSETS
+        BALANCE
     FROM
         BRANCH
+        NATURAL JOIN ACCOUNT
     WHERE
-        ASSETS >= 1000
+        BALANCE <= 1000
 )
+SELECT
+    BRANCH_CITY,
+    AVG(BALANCE)
+FROM
+    BALANCE_FROM_1001
+GROUP BY
+    BRANCH_CITY;
+
+
+--3 with having
 SELECT
     BRANCH_CITY,
     AVG(ASSETS)
