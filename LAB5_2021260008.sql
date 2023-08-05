@@ -147,16 +147,31 @@ FROM
         FROM
             TEMP
         WHERE
-            1500 < ALL(
-                SELECT
-                    AMOUNT
-                FROM
-                    LOAN
-                WHERE
-                    BRANCH_NAME = TEMP.BRANCH_NAME
-            )
+            1500 < AVG_AM
     )TEMP2,      BRANCH B
 WHERE
     B.BRANCH_NAME = TEMP2.BRANCH_NAME
 GROUP BY
-    TEMP2.BRANCH_CITY
+    TEMP2.BRANCH_CITY;
+
+--4 WITH HAVING
+SELECT
+    BRANCH_CITY,
+    AVG(AVG_L)
+FROM
+    (
+        SELECT
+            BRANCH_NAME,
+            AVG(AMOUNT) AS AVG_L
+        FROM
+            LOAN
+        WHERE
+            BRANCH_NAME = LOAN.BRANCH_NAME
+            
+        GROUP BY
+            BRANCH_NAME
+            HAVING AVG(AMOUNT) >= 1500
+    )      
+    NATURAL JOIN BRANCH
+GROUP BY
+    BRANCH.BRANCH_CITY;
