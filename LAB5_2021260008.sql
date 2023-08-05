@@ -96,15 +96,6 @@ GROUP BY
     BRANCH_CITY;
 
 
---3 with having
-SELECT
-    BRANCH_CITY,
-    AVG(ASSETS)
-FROM
-    BALANCE_FROM_1001
-GROUP BY
-    BRANCH_CITY;
-
 --3 with haveing
 SELECT
     BRANCH_CITY,
