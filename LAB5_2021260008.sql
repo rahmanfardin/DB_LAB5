@@ -97,12 +97,3 @@ GROUP BY
 
 
 --3 with haveing
-SELECT
-    BRANCH_CITY,
-    AVG(ASSETS)
-FROM
-    BRANCH
-GROUP BY
-    BRANCH_CITY
-HAVING
-    SUM(ASSETS) >= 1000;
