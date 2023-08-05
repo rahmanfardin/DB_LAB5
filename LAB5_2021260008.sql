@@ -55,25 +55,26 @@ FROM
         CUSTOMER
         NATURAL JOIN BORROWER
         NATURAL JOIN LOAN
-        NATURAL JOIN BRANCH
- --2 SUB
+        NATURAL JOIN BRANCH;
+
+--2 SUB
+SELECT
+    CUSTOMER_NAME,
+    CUSTOMER_STREET,
+    CUSTOMER_CITY
+FROM
+    CUSTOMER CUS
+WHERE
+    CUS.CUSTOMER_CITY = SOME(
         SELECT
-            CUSTOMER_NAME,
-            CUSTOMER_STREET,
-            CUSTOMER_CITY
+            BRANCH_CITY
         FROM
-            CUSTOMER CUS
+            BRANCH
+            NATURAL JOIN BORROWER
+            NATURAL JOIN LOAN
         WHERE
-            CUS.CUSTOMER_CITY = SOME(
-                SELECT
-                    BRANCH_CITY
-                FROM
-                    BRANCH
-                    NATURAL JOIN BORROWER
-                    NATURAL JOIN LOAN
-                WHERE
-                    CUS.CUSTOMER_NAME = BORROWER.CUSTOMER_NAME
-            );
+            CUS.CUSTOMER_NAME = BORROWER.CUSTOMER_NAME
+    );
 
 --3 without having
 WITH BALANCE_FROM_1001 AS(
